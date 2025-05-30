@@ -3,62 +3,70 @@ trigger:
   - main
 
 pool:
-  vmImage: windows-latest
+  vmImage: 'windows-latest'
 
 variables:
-  buildConfiguration: Release
-  azureAppName: backendapprani
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
   dotnetVersion: '8.0.x'
-  ASPNETCORE_ENVIRONMENT: Production
+  azureAppName: 'backendapprani'
 
 steps:
 - task: UseDotNet@2
   inputs:
-    packageType: sdk
-    version: $(dotnetVersion)
+    version: '$(dotnetVersion)'
+    includePreviewVersions: true
   displayName: Install .NET SDK
 
-- script: dotnet restore
-  displayName: Restore Dependencies
+- task: NuGetToolInstaller@1
+  displayName: Install NuGet Tools
 
-- script: dotnet build --configuration $(buildConfiguration) --no-restore
-  displayName: Build .NET Project
-
-- script: dotnet test --no-build --verbosity normal
-  displayName: Run Tests
-  continueOnError: true
-
-- task: DotNetCoreCLI@2
+- task: NuGetCommand@2
   inputs:
-    command: publish
-    publishWebProjects: true
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    zipAfterPublish: true
-  displayName: Publish .NET Project
+    restoreSolution: '$(solution)'
+  displayName: Restore NuGet Packages
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+  displayName: Build Solution
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\*Tests.dll
+      !**\*TestAdapter.dll
+      !**\obj\**
+  displayName: Run Tests
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: $(Build.ArtifactStagingDirectory)
-    ArtifactName: drop
-    publishLocation: Container
-  displayName: Publish Build Artifacts
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+  displayName: Publish Artifacts
 
-- task: AzureWebApp@1
+- task: AzureRmWebAppDeployment@4
   inputs:
-    azureSubscription: AzureConnection
-    appType: webAppWindows
-    appName: $(azureAppName)
-    package: $(Build.ArtifactStagingDirectory)/**/*.zip
-    deploymentMethod: auto
-    connectionStrings: |
-      {
-        "AzureBlobStorage:ConnectionString": {
-          "value": "$(BlobStorageConnectionString)",
-          "type": "Custom"
-        },
-        "ConnectionStrings:DefaultConnection": {
-          "value": "$(SqlConnectionString)",
-          "type": "SQLAzure"
-        }
-      }
-  displayName: Deploy to Azure App Service 
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'AzureConnection'
+    appType: 'webApp'
+    WebAppName: '$(azureAppName)'
+    packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+    enableCustomDeployment: true
+    DeploymentType: 'webDeploy'
+    RemoveAdditionalFilesFlag: true
+    AdditionalArguments: '-retryAttempts:6 -retryInterval:10000'
+    AppSettings: |
+      -ASPNETCORE_ENVIRONMENT Production
+      -ASPNETCORE_DETAILEDERRORS true
+      -ConnectionStrings.DefaultConnection $(SqlConnectionString)
+      -AzureBlobStorage.ConnectionString $(BlobStorageConnectionString)
+  displayName: Deploy to Azure Web App 
