@@ -64,9 +64,5 @@ steps:
     DeploymentType: 'webDeploy'
     RemoveAdditionalFilesFlag: true
     AdditionalArguments: '-retryAttempts:6 -retryInterval:10000'
-    AppSettings: |
-      -ASPNETCORE_ENVIRONMENT Production
-      -ASPNETCORE_DETAILEDERRORS true
-      -ConnectionStrings.DefaultConnection $(SqlConnectionString)
-      -AzureBlobStorage.ConnectionString $(BlobStorageConnectionString)
+    AppSettings: '-ASPNETCORE_ENVIRONMENT "Production" -ASPNETCORE_DETAILEDERRORS "true"'
   displayName: Deploy to Azure Web App 
