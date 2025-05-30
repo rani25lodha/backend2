@@ -3,12 +3,12 @@ trigger:
   - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
 
 variables:
   buildConfiguration: Release
   azureAppName: backendapprani
-  dotnetVersion: 8.0.x
+  dotnetVersion: '8.0.x'
   ASPNETCORE_ENVIRONMENT: Production
 
 steps:
@@ -46,8 +46,19 @@ steps:
 - task: AzureWebApp@1
   inputs:
     azureSubscription: AzureConnection
-    appType: webApp
+    appType: webAppWindows
     appName: $(azureAppName)
     package: $(Build.ArtifactStagingDirectory)/**/*.zip
     deploymentMethod: auto
+    connectionStrings: |
+      {
+        "AzureBlobStorage:ConnectionString": {
+          "value": "$(BlobStorageConnectionString)",
+          "type": "Custom"
+        },
+        "ConnectionStrings:DefaultConnection": {
+          "value": "$(SqlConnectionString)",
+          "type": "SQLAzure"
+        }
+      }
   displayName: Deploy to Azure App Service 
