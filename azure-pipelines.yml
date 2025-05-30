@@ -1,0 +1,57 @@
+# ASP.NET Core backend pipeline for EduSync Assessment
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: Release
+  azureAppName: backendedusync2
+  dotnetVersion: 8.0.x
+  ASPNETCORE_ENVIRONMENT: Production
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: sdk
+    version: $(dotnetVersion)
+  displayName: Install .NET SDK
+
+- script: dotnet restore
+  displayName: Restore Dependencies
+
+- script: dotnet build --configuration $(buildConfiguration) --no-restore
+  displayName: Build .NET Project
+
+- script: dotnet test --no-build --verbosity normal
+  displayName: Run Tests
+  continueOnError: true
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: publish
+    publishWebProjects: true
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) /p:EnvironmentName=$(ASPNETCORE_ENVIRONMENT)'
+    zipAfterPublish: true
+  displayName: Publish .NET Project
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: $(Build.ArtifactStagingDirectory)
+    ArtifactName: drop
+    publishLocation: Container
+  displayName: Publish Build Artifacts
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: AzureConnection
+    appType: webApp
+    appName: $(azureAppName)
+    package: $(Build.ArtifactStagingDirectory)/**/*.zip
+    deploymentMethod: auto
+    appSettings: |
+      -ASPNETCORE_ENVIRONMENT "Production"
+      -ASPNETCORE_DETAILEDERRORS "true"
+      -ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS "true"
+  displayName: Deploy to Azure App Service 

@@ -7,6 +7,11 @@ using EduSync_Assessment.BlobServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure logging
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 // Add CORS for frontend access
 builder.Services.AddCors(options =>
 {
@@ -56,18 +61,37 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-//Use Swagger only in Development
+// Configure error handling
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.UseExceptionHandler("/error");
+    app.UseHsts();
 }
 
 //  Enable Middleware
 app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
-app.UseAuthentication(); // ?? Must be before Authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
+// Add basic error handling endpoint
+app.MapGet("/error", () => Results.Problem("An error occurred.", statusCode: 500));
+
 app.MapControllers();
-app.Run();
+
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "Application startup failed");
+    throw;
+}
