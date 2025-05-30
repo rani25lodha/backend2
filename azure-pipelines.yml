@@ -7,7 +7,7 @@ pool:
 
 variables:
   buildConfiguration: Release
-  azureAppName: backendedusync2
+  azureAppName: backendapprani
   dotnetVersion: 8.0.x
   ASPNETCORE_ENVIRONMENT: Production
 
@@ -32,7 +32,7 @@ steps:
   inputs:
     command: publish
     publishWebProjects: true
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) /p:EnvironmentName=$(ASPNETCORE_ENVIRONMENT)'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: true
   displayName: Publish .NET Project
 
@@ -50,8 +50,9 @@ steps:
     appName: $(azureAppName)
     package: $(Build.ArtifactStagingDirectory)/**/*.zip
     deploymentMethod: auto
-    appSettings: |
-      -ASPNETCORE_ENVIRONMENT "Production"
-      -ASPNETCORE_DETAILEDERRORS "true"
-      -ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS "true"
+    appSettings: >-
+      -ASPNETCORE_ENVIRONMENT="Production" 
+      -ASPNETCORE_DETAILEDERRORS="true" 
+      -ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS="true" 
+      -WEBSITE_RUN_FROM_PACKAGE="1"
   displayName: Deploy to Azure App Service 
