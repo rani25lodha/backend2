@@ -50,9 +50,4 @@ steps:
     appName: $(azureAppName)
     package: $(Build.ArtifactStagingDirectory)/**/*.zip
     deploymentMethod: auto
-    appSettings: >
-      ASPNETCORE_ENVIRONMENT=Production 
-      ASPNETCORE_DETAILEDERRORS=true 
-      ASPNETCORE_LOGGING__CONSOLE__DISABLECOLORS=true 
-      WEBSITE_RUN_FROM_PACKAGE=1
   displayName: Deploy to Azure App Service 
