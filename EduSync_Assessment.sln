@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EduSync_Assessment", "EduSync_Assessment\EduSync_Assessment.csproj", "{56D4864C-50F3-475F-B42C-E2F526E8B1A6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{56D4864C-50F3-475F-B42C-E2F526E8B1A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56D4864C-50F3-475F-B42C-E2F526E8B1A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56D4864C-50F3-475F-B42C-E2F526E8B1A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56D4864C-50F3-475F-B42C-E2F526E8B1A6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A77580CB-5AD8-4C27-8DC6-1DAB30400D3C}
+	EndGlobalSection
+EndGlobal
