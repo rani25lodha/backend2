@@ -1,45 +1,59 @@
-# .NET Core specific
-*.swp
-*.*~
-project.lock.json
-.DS_Store
-*.pyc
-nupkg/
-
-# Visual Studio files
-.vs/
-.vscode/
+# .NET Core
+bin/
+obj/
 *.user
 *.userosscache
-*.sln.docstates
 *.suo
 *.userprefs
 
+# IDE files
+.vs/
+.vscode/
+*.swp
+*.swo
+
+# Sensitive configuration
+appsettings.json
+appsettings.Development.json
+appsettings.*.json
+
+# Logs
+*.log
+logs/
+
 # Build results
 [Dd]ebug/
-[Dd]ebugPublic/
 [Rr]elease/
-[Rr]eleases/
 x64/
 x86/
-build/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
 bld/
 [Bb]in/
 [Oo]bj/
-[Oo]ut/
-msbuild.log
-msbuild.err
-msbuild.wrn
+[Ll]og/
+
+# Visual Studio files
+*.sln.docstates
+*.sln.iml
 
 # Dependencies
 node_modules/
 .dist/
 
-# Sensitive configuration files
-appsettings.json
-appsettings.Development.json
-appsettings.*.json
+# DS_Store
+.DS_Store
+
+# pyc
+*.pyc
+
+# nupkg
+nupkg/
+
+# msbuild
+msbuild.log
+msbuild.err
+msbuild.wrn
 
 # IDE
-.idea/
-*.sln.iml 
+.idea/ 
