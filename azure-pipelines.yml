@@ -64,12 +64,12 @@ steps:
     appSettings: |
       -ASPNETCORE_ENVIRONMENT Development
       -ASPNETCORE_DETAILEDERRORS true
-      -DefaultConnection "$(DefaultConnection)"
-      -MyBlob "$(MyBlob)"
-      -JwtKey "$(JwtKey)"
-      -JwtIssuer "$(JwtIssuer)"
-      -JwtAudience "$(JwtAudience)"
-      -JwtDurationInMinutes "$(JwtDurationInMinutes)"
-      -MyBlob_AccountKey "$(MyBlob_AccountKey)"
-      -MyBlob_AccountName "$(MyBlob_AccountName)"
-      -MyBlob_ContainerName "$(MyBlob_ContainerName)" 
+   
+   
+   
+   
+   
+   
+   
+   
+   
