@@ -8,7 +8,7 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  dotnetVersion: '7.0.x'  # Adjust this to match your project's .NET version
+  dotnetVersion: '8.0.x'  # Updated to .NET 8.0
   webAppName: 'webappedusync'
   azureSubscription: 'AzureConnection'
 
