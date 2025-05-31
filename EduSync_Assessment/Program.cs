@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // React frontend
+        policy.WithOrigins("https://white-desert-01d385d00.6.azurestaticapps.net") // React frontend
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); // Required if cookies or tokens used
