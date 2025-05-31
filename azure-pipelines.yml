@@ -61,9 +61,7 @@ steps:
     azureSubscription: '$(azureSubscription)'
     appName: '$(webAppName)'
     package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
-    appSettings: |
-      -ASPNETCORE_ENVIRONMENT Development
-      -ASPNETCORE_DETAILEDERRORS true
+    appSettings: '-ASPNETCORE_ENVIRONMENT "Development" -ASPNETCORE_DETAILEDERRORS "true"'
    
    
    
