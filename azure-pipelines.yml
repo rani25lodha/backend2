@@ -9,6 +9,8 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
   dotnetVersion: '7.0.x'  # Adjust this to match your project's .NET version
+  webAppName: 'webappedusync'
+  azureSubscription: 'AzureConnection'
 
 steps:
 - task: UseDotNet@2
@@ -51,4 +53,23 @@ steps:
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
     artifactName: 'drop'
-    publishLocation: 'Container' 
+    publishLocation: 'Container'
+
+- task: AzureWebApp@1
+  displayName: 'Deploy Azure Web App'
+  inputs:
+    azureSubscription: '$(azureSubscription)'
+    appName: '$(webAppName)'
+    package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+    appSettings: |
+      -ASPNETCORE_ENVIRONMENT Development
+      -ASPNETCORE_DETAILEDERRORS true
+      -DefaultConnection "$(DefaultConnection)"
+      -MyBlob "$(MyBlob)"
+      -JwtKey "$(JwtKey)"
+      -JwtIssuer "$(JwtIssuer)"
+      -JwtAudience "$(JwtAudience)"
+      -JwtDurationInMinutes "$(JwtDurationInMinutes)"
+      -MyBlob_AccountKey "$(MyBlob_AccountKey)"
+      -MyBlob_AccountName "$(MyBlob_AccountName)"
+      -MyBlob_ContainerName "$(MyBlob_ContainerName)" 
