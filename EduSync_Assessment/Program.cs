@@ -15,7 +15,10 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 // Add Application Insights
-builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["ApplicationInsights:InstrumentationKey"]);
+builder.Services.AddApplicationInsightsTelemetry(options =>
+{
+    options.ConnectionString = $"InstrumentationKey={builder.Configuration["ApplicationInsights:InstrumentationKey"]}";
+});
 
 // Add CORS for frontend access
 builder.Services.AddCors(options =>

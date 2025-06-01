@@ -130,12 +130,12 @@ namespace EduSync_Assessment.Controllers
             try
             {
                 // Get additional information for the event
-                var assessment = await _context.Assessments
+                var assessment = await _context.AssessmentTables
                     .Include(a => a.Course)
                     .FirstOrDefaultAsync(a => a.AssessmentId == dto.AssessmentId);
                 
-                var student = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Id == dto.UserId);
+                var student = await _context.UserTables
+                    .FirstOrDefaultAsync(u => u.UserId == dto.UserId);
 
                 var resultEvent = new
                 {
@@ -183,12 +183,12 @@ namespace EduSync_Assessment.Controllers
             try
             {
                 // Get additional information for the event
-                var assessment = await _context.Assessments
+                var assessment = await _context.AssessmentTables
                     .Include(a => a.Course)
                     .FirstOrDefaultAsync(a => a.AssessmentId == dto.AssessmentId);
                 
-                var student = await _context.Users
-                    .FirstOrDefaultAsync(u => u.Id == dto.UserId);
+                var student = await _context.UserTables
+                    .FirstOrDefaultAsync(u => u.UserId == dto.UserId);
 
                 var resultEvent = new
                 {
