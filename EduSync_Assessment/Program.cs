@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using EduSync_Assessment.Data;
 using EduSync_Assessment.BlobServices;
+using EduSync_Assessment.Services;
 using Microsoft.ApplicationInsights.Extensibility;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +31,10 @@ builder.Services.AddCors(options =>
 
 // Add Blob Storage Service
 builder.Services.AddScoped<IBlobStorageService, BlobStorageService>();
+
+// Add Event Hub Service
+builder.Services.AddSingleton<EventHubService>();
+
 // Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
