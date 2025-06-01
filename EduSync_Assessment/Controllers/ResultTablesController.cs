@@ -6,7 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EduSync_Assessment.Data;
 using EduSync_Assessment.Models;
-using EduSync_Assessment.DTO; 
+using EduSync_Assessment.DTO;
+using EduSync_Assessment.Services;
+using Microsoft.Extensions.Logging;
 
 namespace EduSync_Assessment.Controllers
 {
@@ -15,10 +17,17 @@ namespace EduSync_Assessment.Controllers
     public class ResultTablesController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly EventHubService _eventHubService;
+        private readonly ILogger<ResultTablesController> _logger;
 
-        public ResultTablesController(AppDbContext context)
+        public ResultTablesController(
+            AppDbContext context,
+            EventHubService eventHubService,
+            ILogger<ResultTablesController> logger)
         {
             _context = context;
+            _eventHubService = eventHubService;
+            _logger = logger;
         }
 
         // GET: api/ResultTables/by-instructor/{instructorId}
@@ -118,6 +127,39 @@ namespace EduSync_Assessment.Controllers
                 AttemptDate = newResult.AttemptDate
             };
 
+            try
+            {
+                // Get additional information for the event
+                var assessment = await _context.Assessments
+                    .Include(a => a.Course)
+                    .FirstOrDefaultAsync(a => a.AssessmentId == dto.AssessmentId);
+                
+                var student = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == dto.UserId);
+
+                var resultEvent = new
+                {
+                    ResultId = newResult.ResultId,
+                    StudentId = dto.UserId,
+                    StudentName = student?.Name,
+                    AssessmentId = dto.AssessmentId,
+                    AssessmentTitle = assessment?.Title,
+                    CourseTitle = assessment?.Course?.Title,
+                    Score = dto.Score,
+                    MaxScore = assessment?.MaxScore,
+                    AttemptDate = dto.AttemptDate,
+                    Percentage = assessment?.MaxScore > 0 ? (dto.Score * 100 / assessment.MaxScore) : 0
+                };
+
+                await _eventHubService.SendEventAsync(resultEvent, "ResultCreated");
+                _logger.LogInformation($"Result event sent for student {student?.Name}, Assessment: {assessment?.Title}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending result event to Event Hub");
+                // We don't want to fail the API call if event sending fails
+            }
+
             return CreatedAtAction(nameof(GetResultTable), new { id = newResult.ResultId }, readDto);
         }
 
@@ -137,6 +179,39 @@ namespace EduSync_Assessment.Controllers
             result.AttemptDate = dto.AttemptDate;
 
             await _context.SaveChangesAsync();
+
+            try
+            {
+                // Get additional information for the event
+                var assessment = await _context.Assessments
+                    .Include(a => a.Course)
+                    .FirstOrDefaultAsync(a => a.AssessmentId == dto.AssessmentId);
+                
+                var student = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == dto.UserId);
+
+                var resultEvent = new
+                {
+                    ResultId = id,
+                    StudentId = dto.UserId,
+                    StudentName = student?.Name,
+                    AssessmentId = dto.AssessmentId,
+                    AssessmentTitle = assessment?.Title,
+                    CourseTitle = assessment?.Course?.Title,
+                    Score = dto.Score,
+                    MaxScore = assessment?.MaxScore,
+                    AttemptDate = dto.AttemptDate,
+                    Percentage = assessment?.MaxScore > 0 ? (dto.Score * 100 / assessment.MaxScore) : 0
+                };
+
+                await _eventHubService.SendEventAsync(resultEvent, "ResultUpdated");
+                _logger.LogInformation($"Result update event sent for student {student?.Name}, Assessment: {assessment?.Title}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending result update event to Event Hub");
+                // We don't want to fail the API call if event sending fails
+            }
 
             return NoContent();
         }
