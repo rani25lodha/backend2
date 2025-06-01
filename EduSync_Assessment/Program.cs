@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using EduSync_Assessment.Data;
 using EduSync_Assessment.BlobServices;
+using Microsoft.ApplicationInsights.Extensibility;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,12 +13,15 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
+// Add Application Insights
+builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["ApplicationInsights:InstrumentationKey"]);
+
 // Add CORS for frontend access
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // React frontend
+        policy.WithOrigins("https://white-desert-01d385d00.6.azurestaticapps.net") // React frontend
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); // Required if cookies or tokens used
